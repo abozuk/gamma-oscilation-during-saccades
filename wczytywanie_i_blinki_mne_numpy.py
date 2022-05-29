@@ -127,28 +127,28 @@ def detektor_bs(syg, option = 'numpy'): #/mne_library
         print(syg_caly_m)
         print(syg_caly_m.shape)
         
-        def plot_channels(signal, t, channel_names):
-            plt.figure(figsize = (9,9))
-            n_plots = signal.shape[0]
-            for i in range(signal.shape[0]):
-                plt.subplot(n_plots, 1, i+1)
-                plt.plot(t, signal[i,:])
-                plt.title(channel_names[i])
-        
-            plt.subplots_adjust(hspace=.9)
-            plt.show()
-            
-        plot_channels(syg_caly_m, t, chosen_channels) #przed usunięciem blinków
-        
-        for k in range(19):
-            for idx in blinki:
-                syg_caly_m[k, idx] = 0
-            
-        print(syg_caly_m)
-        print(syg_caly_m.shape)
-        
-        
-        plot_channels(syg_caly_m, t, chosen_channels) #po usunięciu blinków
+    # def plot_channels(signal, t, channel_names):
+    #         plt.figure(figsize = (9,9))
+    #         n_plots = signal.shape[0]
+    #         for i in range(signal.shape[0]):
+    #             plt.subplot(n_plots, 1, i+1)
+    #             plt.plot(t, signal[i,:])
+    #             plt.title(channel_names[i])
+    #
+    #         plt.subplots_adjust(hspace=.9)
+    #         plt.show()
+    #
+    #     plot_channels(syg_caly_m, t, chosen_channels) #przed usunięciem blinków
+    #
+    #     for k in range(19):
+    #         for idx in blinki:
+    #             syg_caly_m[k, idx] = 0
+    #
+    #     print(syg_caly_m)
+    #     print(syg_caly_m.shape)
+    #
+    #
+    #     plot_channels(syg_caly_m, t, chosen_channels) #po usunięciu blinków
         
         
         #print(sigFp)
@@ -189,16 +189,18 @@ def detektor_bs(syg, option = 'numpy'): #/mne_library
         
        
         reconst_syg.plot(title ="Sygnał po") #sygnał po usunięciu mrugnięć
+        return ica.get_sources(syg)
         
         #del reconst_syg
         
        
-# if ___name___ == '__main__':
-for f in os.listdir('.'):
-    pattern = "sub-ARZ000_task_art_watch"+".*\.vhdr$"
-    if re.match(pattern, f):
-        current_signal = wczytaj(f)
-        #print("po pierwszej funkcji")
-        #detektor_bs(current_signal, 'mne_lib')
-        detektor_bs(current_signal, 'numpy')
+if __name__ == '__main__':
+    for f in os.listdir('.'):
+        pattern = "sub-ARZ000_task_art_watch"+".*\.vhdr$"
+        if re.match(pattern, f):
+            current_signal = wczytaj(f)
+            print("po pierwszej funkcji")
+            a = detektor_bs(current_signal, 'mne_lib')
+            detektor_bs(current_signal, 'numpy')
+            print(a)
             
