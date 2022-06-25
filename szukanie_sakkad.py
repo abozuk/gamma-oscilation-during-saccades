@@ -15,7 +15,9 @@ import matplotlib.pyplot as plt
 from scipy.signal import find_peaks, peak_prominences
 import numpy as np 
 from mne.preprocessing import ICA
-
+import scipy.stats as st
+import pylab as py
+import random
 
 
 def wczytaj(filename):#/mne_lib
@@ -220,9 +222,24 @@ for f in os.listdir('.'):
         i, d1,d2,t = detektor_bs(current_signal, 'mne_lib')
         y_diff = np.abs(d1[1,:]-d2[1,:]) #moduł różnicy miedzy sygnałem z sakkadami i sygnałem, w którym je usunęlismy
         
+        #szukanie wartosci powyzej których uznajemy cos za sakkady
+        alfa = 0.3 # trzeba ustalic tę wartosc
+        lo = st.scoreatpercentile(y_diff, per = alfa/2*100)# nie wiem czy wystarczy na podstawie tego czy trzeba jakiegos bootstrapa
+        hi = st.scoreatpercentile(y_diff, per = (1-alfa/2)*100)
+        print('przedzial ufnosci: %(lo).8f - %(hi).8f\n'%{'lo':lo,'hi':hi})
+        szer_binu = (hi-lo)/10
+        biny = np.arange(lo-10*szer_binu, hi+11*szer_binu, szer_binu)
+        py.figure()
+        (n,y,patch) = py.hist(y_diff,bins = biny )
+        py.plot([lo, lo] , [0, np.max(n)] ,'r' )
+        py.plot([hi,hi],[0, np.max(n)],'r')
+        py.show()
+        
+        
+        #detekcja sakkad
         saccades = d1[1,:].copy()
-        saccades[y_diff<0.5e-5] = np.nan # tu jest problem że trzeba ustawić powyżej której wartosci zaznaczamy
-        #values[ values==0 ] = np.nan
+        saccades[y_diff<hi] = np.nan # bieżemy tylko te które są powyżej wartosci odciecia hi
+        
         plt.figure()
         #plt.hist(y_diff, bins = 100) #histogram żeby mniej więcej okreslic które wartosci odcinamy (może dodać automatyczne odcinanie jakiegos procentu?)
         
