@@ -1,35 +1,50 @@
-import numpy as np
+import copy
 
-# from szukanie_sakkad import wczytaj
+
 class Epoch:
     def __init__(self, event_prop):
+        # TODO better to have in dict ?
         self._idx = event_prop["event_idx"]
         self._onset = event_prop["onset"]
         self._duration = event_prop["duration"]
         self._series = event_prop["series"]
         self._img_no = event_prop["image_number"]
+        self._st_idx = None
+        self._end_idx = None
         self._sig = None
+        self._ica = None
         self._t = None
+        self._saccades_idx = None
 
     def __str__(self):
+        return "series: {}, image number: {}".format(self._series, self._img_no)
+
+    def __repr__(self):
         return self._series + self._img_no
 
-    def get_epoch_signal(self, sig_mne):
-        Fs = sig_mne.info['sfreq']
-        st_idx = sig_mne.time_as_index(self._onset)[0]
-        end_idx = st_idx + int(self._duration * Fs)
-        print(st_idx, end_idx)
-        self._sig = sig_mne[:, st_idx:end_idx][0]
-        self._t = sig_mne.times[st_idx:end_idx]
+    @property
+    def signal(self):
+        return copy.copy(self._sig)
 
-    def plot(self):
-        n = self._sig.shape[0]
-        fig, axs = plt.subplots(4, 5)
-        for i in range(n):
-            axs[i // 5, i % 5].plot(self._t, self._sig[i, :])
-        # prop
-        # plt.savefig()
-        plt.show()
+    @signal.setter
+    def signal(self, sig_mne):
+        Fs = sig_mne.info['sfreq']
+        self._st_idx = sig_mne.time_as_index(self._onset)[0]
+        self._end_idx = self._st_idx + int(self._duration * Fs)
+        self._sig = sig_mne[:, self._st_idx:self._end_idx][0]
+        self._t = sig_mne.times[self._st_idx:self._end_idx]
+
+    @property
+    def t(self):
+        return copy.copy(self._t)
+
+    @property
+    def ica(self):
+        return copy.copy(self._ica)
+
+    @ica.setter
+    def ica(self, ica):
+        self._ica = ica[self._st_idx:self._end_idx]
 
 
 class ExtractEventInfo:
@@ -57,19 +72,16 @@ class ExtractEventInfo:
         return props_dict
 
 
-def epochs_factory(df, signal_from_mne):
+def epochs_factory(df, sig_from_mne, ica):
     start_time = df.onset[0]
     end_time = df.onset.iloc[-1]
+    epoch_list = []
     extractor = ExtractEventInfo(start_time, end_time)
     img_events = df.loc[df.description.str.contains("/P")]
     for idx, row in img_events.reindex().sort_index(ascending=False).iterrows():
         e = Epoch(extractor(idx, row))
-        e.get_epoch_signal(signal_from_mne)
-        e.plot()
+        e.signal = sig_from_mne
+        e.ica = ica[1][0][0]
+        epoch_list.append(e)
 
-path = 'sub-ARZ000_task_art_watch1_run-01.vhdr'
-signal_mne = wczytaj(path)
-
-
-
-
+    return epoch_list

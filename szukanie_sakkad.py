@@ -212,28 +212,28 @@ def detektor_bs(syg, option = 'numpy'): #/mne_library
         return ica, data1, data2, times
         
        
-# if ___name___ == '__main__':
-for f in os.listdir('.'):
-    pattern = "sub-ARZ000_task_art_watch"+".*\.vhdr$"
-    if re.match(pattern, f):
-        current_signal = wczytaj(f)
-        #print("po pierwszej funkcji")
-        #detektor_bs(current_signal, 'mne_lib')
-        i, d1,d2,t = detektor_bs(current_signal, 'mne_lib')
-        y_diff = np.abs(d1[1,:]-d2[1,:]) #moduł różnicy miedzy sygnałem z sakkadami i sygnałem, w którym je usunęlismy
-        
-        #szukanie wartosci powyzej których uznajemy cos za sakkady
-        alfa = 0.3 # trzeba ustalic tę wartosc
-        lo = st.scoreatpercentile(y_diff, per = alfa/2*100)# nie wiem czy wystarczy na podstawie tego czy trzeba jakiegos bootstrapa
-        hi = st.scoreatpercentile(y_diff, per = (1-alfa/2)*100)
-        print('przedzial ufnosci: %(lo).8f - %(hi).8f\n'%{'lo':lo,'hi':hi})
-        szer_binu = (hi-lo)/10
-        biny = np.arange(lo-10*szer_binu, hi+11*szer_binu, szer_binu)
-        py.figure()
-        (n,y,patch) = py.hist(y_diff,bins = biny )
-        py.plot([lo, lo] , [0, np.max(n)] ,'r' )
-        py.plot([hi,hi],[0, np.max(n)],'r')
-        py.show()
+if __name__ == '__main__':
+    for f in os.listdir('.'):
+        pattern = "sub-ARZ000_task_art_watch"+".*\.vhdr$"
+        if re.match(pattern, f):
+            current_signal = wczytaj(f)
+            #print("po pierwszej funkcji")
+            #detektor_bs(current_signal, 'mne_lib')
+            i, d1,d2,t = detektor_bs(current_signal, 'mne_lib')
+            y_diff = np.abs(d1[1,:]-d2[1,:]) #moduł różnicy miedzy sygnałem z sakkadami i sygnałem, w którym je usunęlismy
+
+            #szukanie wartosci powyzej których uznajemy cos za sakkady
+            alfa = 0.3 # trzeba ustalic tę wartosc
+            lo = st.scoreatpercentile(y_diff, per = alfa/2*100)# nie wiem czy wystarczy na podstawie tego czy trzeba jakiegos bootstrapa
+            hi = st.scoreatpercentile(y_diff, per = (1-alfa/2)*100)
+            print('przedzial ufnosci: %(lo).8f - %(hi).8f\n'%{'lo':lo,'hi':hi})
+            szer_binu = (hi-lo)/10
+            biny = np.arange(lo-10*szer_binu, hi+11*szer_binu, szer_binu)
+            py.figure()
+            (n,y,patch) = py.hist(y_diff,bins = biny )
+            py.plot([lo, lo] , [0, np.max(n)] ,'r' )
+            py.plot([hi,hi],[0, np.max(n)],'r')
+            py.show()
         
         
         #detekcja sakkad

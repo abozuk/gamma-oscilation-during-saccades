@@ -98,17 +98,18 @@ def detektor_bs(syg, option = 'numpy'): #/mne_library
         
        
         reconst_syg.plot(title ="Sygnał po") #sygnał po usunięciu mrugnięć
+        return reconst_syg
         
         #del reconst_syg
         
        
-# if ___name___ == '__main__':
-for f in os.listdir('.'):
-    pattern = "sub-ARZ000_task_art_watch"+".*\.vhdr$"
-    if re.match(pattern, f):
-        current_signal = wczytaj(f)
-        #print("po pierwszej funkcji")
-        detektor_bs(current_signal, 'mne_lib')
+if __name__ == '__main__':
+    for f in os.listdir('.'):
+        pattern = "sub-ARZ000_task_art_watch"+".*\.vhdr$"
+        if re.match(pattern, f):
+            current_signal = wczytaj(f)
+            #print("po pierwszej funkcji")
+            detektor_bs(current_signal, 'mne_lib')
             
     
 

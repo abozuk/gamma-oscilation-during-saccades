@@ -179,16 +179,16 @@ def detektor_bs(syg, option = 'numpy'): #/mne_library
         reject = dict(mag=5e-10, grad=4000e-11)
         ica.fit(raw, picks=picks_eeg, decim=decim, reject=reject)
 
-        ica.plot_components(inst=syg, psd_args={'fmax': 49.})
+        # ica.plot_components(inst=syg, psd_args={'fmax': 49.})
         ica.exclude = [0] #ręcznie wybrany komponent z mrugnięciami do usunięcia; przy większej ilości badanych można zastosowć bardziej automatyczny sposób
         reconst_syg = syg.copy()
         ica.apply(reconst_syg)
 
-        syg.plot(title = "Sygnał przed" ) #sygnał przed rekonstrukcją
+        # syg.plot(title = "Sygnał przed" ) #sygnał przed rekonstrukcją
 
         
        
-        reconst_syg.plot(title ="Sygnał po") #sygnał po usunięciu mrugnięć
+        # reconst_syg.plot(title ="Sygnał po") #sygnał po usunięciu mrugnięć
         return ica.get_sources(syg)
         
         #del reconst_syg
