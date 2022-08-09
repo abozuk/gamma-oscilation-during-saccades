@@ -1,4 +1,5 @@
 import copy
+from find_saccades import get_min_diff, get_max_diff, find_saccades
 
 
 class Epoch:
@@ -12,6 +13,7 @@ class Epoch:
         self._st_idx = None
         self._end_idx = None
         self._sig = None
+        self._Fs = None
         self._ica = None
         self._t = None
         self._saccades_idx = None
@@ -28,9 +30,9 @@ class Epoch:
 
     @signal.setter
     def signal(self, sig_mne):
-        Fs = sig_mne.info['sfreq']
+        self._Fs = sig_mne.info['sfreq']
         self._st_idx = sig_mne.time_as_index(self._onset)[0]
-        self._end_idx = self._st_idx + int(self._duration * Fs)
+        self._end_idx = self._st_idx + int(self._duration * self._Fs)
         self._sig = sig_mne[:, self._st_idx:self._end_idx][0]
         self._t = sig_mne.times[self._st_idx:self._end_idx]
 
@@ -45,6 +47,22 @@ class Epoch:
     @ica.setter
     def ica(self, ica):
         self._ica = ica[self._st_idx:self._end_idx]
+
+    @property
+    def saccades_idx(self):
+        return copy.copy(self._saccades_idx)
+
+    def find_saccades(self):
+        sacc_sig = self._ica
+
+        idx_to_diff = int(0.2 * self._Fs)
+        sigFp = sacc_sig
+
+        min_dff = get_min_diff(sigFp, idx_to_diff)
+        max_dff = get_max_diff(sigFp, idx_to_diff)
+        self._saccades_idx = find_saccades(sigFp, self._Fs, min_dff, max_dff)
+
+        return sacc_sig, self._saccades_idx
 
 
 class ExtractEventInfo:
@@ -82,6 +100,7 @@ def epochs_factory(df, sig_from_mne, ica):
         e = Epoch(extractor(idx, row))
         e.signal = sig_from_mne
         e.ica = ica[1][0][0]
+        e.find_saccades()
         epoch_list.append(e)
 
     return epoch_list

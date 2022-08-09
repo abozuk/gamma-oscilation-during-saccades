@@ -26,9 +26,6 @@ Y_AXIS = {"min": -5, "max": 5, "step": 5}
 N_COLUMNS = 3
 
 
-FIG_NAME = "CB_bar"
-
-
 def cm2inch(x):
     return x * 0.39
 
@@ -97,8 +94,19 @@ def axes_formatting(ax):
         label.set_fontproperties(C_DEFAULT_FONT_PROP)
         label.set_fontsize(C_DEFAULT_FONT_SIZE)
 
+def locate_saccades(ssacc):
+    ssacc = np.sort(ssacc)
+    where_stops = np.where(np.diff(ssacc) > 1)[0]
+    ends = ssacc[where_stops]
+    np.append(ends, ssacc[-1])
+    starts = [ssacc[0]]
+    starts.extend(ssacc[where_stops + 1])
+    starts = np.array(starts[:-1])
 
-def plot_epochs(epoch_list, Fs, output_path):
+    return (ends, starts)
+
+
+def plot_ica_epochs(epoch_list, Fs, output_path, saccades=False):
     n = len(epoch_list)
     n_rows = round(n / N_COLUMNS)
     n_plots = n_rows * N_COLUMNS
@@ -109,6 +117,11 @@ def plot_epochs(epoch_list, Fs, output_path):
         ax = axs[i // N_COLUMNS, i % N_COLUMNS]
         sig = e.ica
         ax.plot(t[:sig.shape[0]], sig, linewidth=LINEWIDTH, color='k')
+        if saccades is True:
+            ends, starts = locate_saccades(e.saccades_idx)
+            for s, e in zip(starts, ends):
+
+                ax.plot(t[s:e], sig[s:e], linewidth=LINEWIDTH, color='red')
 
         axes_formatting(ax)
 
@@ -132,7 +145,9 @@ def plot_epochs(epoch_list, Fs, output_path):
             ax = axs[i // n_rows, i % N_COLUMNS]
             ax.axis('off')
 
-    prop = dict(left=0.016, top=0.99, bottom=0.05, right=0.99, hspace=0.15, wspace=0.06)
+    prop = dict(left=0.02, top=0.99, bottom=0.05, right=0.99, hspace=0.15, wspace=0.06)
     plt.subplots_adjust(**prop)
 
     plt.savefig(output_path, dpi=C_DPI)
+    plt.cla()
+    plt.close()
