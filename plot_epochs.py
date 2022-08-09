@@ -94,16 +94,7 @@ def axes_formatting(ax):
         label.set_fontproperties(C_DEFAULT_FONT_PROP)
         label.set_fontsize(C_DEFAULT_FONT_SIZE)
 
-def locate_saccades(ssacc):
-    ssacc = np.sort(ssacc)
-    where_stops = np.where(np.diff(ssacc) > 1)[0]
-    ends = ssacc[where_stops]
-    np.append(ends, ssacc[-1])
-    starts = [ssacc[0]]
-    starts.extend(ssacc[where_stops + 1])
-    starts = np.array(starts[:-1])
 
-    return (ends, starts)
 
 
 def plot_ica_epochs(epoch_list, Fs, output_path, saccades=False):
@@ -118,7 +109,7 @@ def plot_ica_epochs(epoch_list, Fs, output_path, saccades=False):
         sig = e.ica
         ax.plot(t[:sig.shape[0]], sig, linewidth=LINEWIDTH, color='k')
         if saccades is True:
-            ends, starts = locate_saccades(e.saccades_idx)
+            starts, ends = e.loc_saccades_idx
             for s, e in zip(starts, ends):
 
                 ax.plot(t[s:e], sig[s:e], linewidth=LINEWIDTH, color='red')

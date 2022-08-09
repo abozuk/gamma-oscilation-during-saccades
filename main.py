@@ -6,7 +6,7 @@ from wczytywanie_i_blinki_mne_numpy import wczytaj, detektor_bs
 from epochs import epochs_factory
 from plot_epochs import plot_ica_epochs
 from plot_ch_epochs import plot_channels_epochs
-from plot_his import plot_hist
+from plot_his import plot_hist, plot_hist_inter
 
 
 def clean_directory(dir_path):
@@ -64,4 +64,7 @@ if __name__ == "__main__":
             plot_path = os.path.join(output_path, plot_fname)
             plot_ica_epochs(epoch_list, Fs, plot_path, True)
             plot_hist(epoch_list, os.path.join(output_path, plot_fname.replace("ica", "hist")))
-            plot_channels_epochs(epoch_list, Fs, plot_path)
+            plot_hist_inter(epoch_list,
+                            os.path.join(output_path,
+                                         plot_fname.replace("ica", "inter_saccades_hist")))
+            # plot_channels_epochs(epoch_list, Fs, plot_path)

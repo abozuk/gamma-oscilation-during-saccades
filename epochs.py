@@ -1,15 +1,11 @@
 import copy
+import numpy as np
 from find_saccades import get_min_diff, get_max_diff, find_saccades
 
 
 class Epoch:
     def __init__(self, event_prop):
-        # TODO better to have in dict ?
-        self._idx = event_prop["event_idx"]
-        self._onset = event_prop["onset"]
-        self._duration = event_prop["duration"]
-        self._series = event_prop["series"]
-        self._img_no = event_prop["image_number"]
+        self._props = event_prop
         self._st_idx = None
         self._end_idx = None
         self._sig = None
@@ -17,12 +13,35 @@ class Epoch:
         self._ica = None
         self._t = None
         self._saccades_idx = None
+        self._loc_saccades_idx = None
+        self._inter_saccades_idx = None
 
     def __str__(self):
-        return "series: {}, image number: {}".format(self._series, self._img_no)
+        return "series: {}, image number: {}".format(self.series,
+                                                     self.image_number)
 
     def __repr__(self):
-        return self._series + self._img_no
+        return self.series + self.image_number
+
+    @property
+    def event_idx(self):
+        return copy.copy(self._props["event_idx"])
+
+    @property
+    def onset(self):
+        return copy.copy(self._props["onset"])
+
+    @property
+    def duration(self):
+        return copy.copy(self._props["duration"])
+
+    @property
+    def series(self):
+        return copy.copy(self._props["series"])
+
+    @property
+    def image_number(self):
+        return copy.copy(self._props["image_number"])
 
     @property
     def signal(self):
@@ -31,8 +50,8 @@ class Epoch:
     @signal.setter
     def signal(self, sig_mne):
         self._Fs = sig_mne.info['sfreq']
-        self._st_idx = sig_mne.time_as_index(self._onset)[0]
-        self._end_idx = self._st_idx + int(self._duration * self._Fs)
+        self._st_idx = sig_mne.time_as_index(self.onset)[0]
+        self._end_idx = self._st_idx + int(self.duration * self._Fs)
         self._sig = sig_mne[:, self._st_idx:self._end_idx][0]
         self._t = sig_mne.times[self._st_idx:self._end_idx]
 
@@ -52,17 +71,51 @@ class Epoch:
     def saccades_idx(self):
         return copy.copy(self._saccades_idx)
 
+    @property
+    def loc_saccades_idx(self):
+        return copy.copy(self._loc_saccades_idx)
+
+    @property
+    def inter_saccades_idx(self):
+        return copy.copy(self._inter_saccades_idx)
+
     def find_saccades(self):
         sacc_sig = self._ica
 
-        idx_to_diff = int(0.2 * self._Fs)
-        sigFp = sacc_sig
+        idx_to_diff = int(0.2 * self._Fs)  # Jako argument?
 
-        min_dff = get_min_diff(sigFp, idx_to_diff)
-        max_dff = get_max_diff(sigFp, idx_to_diff)
-        self._saccades_idx = find_saccades(sigFp, self._Fs, min_dff, max_dff)
+        min_dff = get_min_diff(sacc_sig, idx_to_diff)
+        max_dff = get_max_diff(sacc_sig, idx_to_diff)
+        self._saccades_idx = find_saccades(sacc_sig, self._Fs, min_dff, max_dff)
+        self._locate_saccades()
 
         return sacc_sig, self._saccades_idx
+
+    def _locate_saccades(self):
+        ssacc = np.sort(self._saccades_idx)
+        where_stops = np.where(np.diff(ssacc) > 1)[0]
+        ends = ssacc[where_stops]
+        np.append(ends, ssacc[-1])
+        starts = [ssacc[0]]
+        starts.extend(ssacc[where_stops + 1])
+        starts = np.array(starts[:-1])
+        self._loc_saccades_idx = (starts, ends)
+        self._locate_inter_saccades(ssacc, where_stops, ends)
+        return starts, ends
+
+    def _locate_inter_saccades(self, ssacc, where_stops, ends):
+        if self._loc_saccades_idx[0].size == 0:
+            self._inter_saccades_idx = ([0], [self.signal.size])
+            return 0
+        elif self._loc_saccades_idx[0][0] == 0:
+            inter_starts = [0]
+        else:
+            inter_starts = []
+
+        inter_starts.extend(ends)
+        inter_ends = ssacc[where_stops + 1]
+        np.append(inter_ends, self._loc_saccades_idx[0][-1])
+        self._inter_saccades_idx = (inter_starts, inter_ends)
 
 
 class ExtractEventInfo:
@@ -82,7 +135,8 @@ class ExtractEventInfo:
                               img_series, img_no)
         return props
 
-    def _to_dict(self, *args):
+    @staticmethod
+    def _to_dict(*args):
         _DICT_PROPS = ["event_idx", "onset", "duration", "series", "image_number"]
         props_dict = {}
         for key, value in zip(_DICT_PROPS, args):
