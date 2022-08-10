@@ -40,6 +40,11 @@ def wczytaj(filename):#/mne_lib
     #mapa.plot(kind='topomap', show_names=True)
 
     #print(mapa)
+
+    #--------------interpolacja na razie tylko do sprawdzenia złego sygnału
+    eeg.info['bads'].append('F8')
+    eeg.info['bads'].append('T7')
+    print(eeg.info['bads'])
     
     eeg_mont = eeg.copy().set_montage(mapa)
 
@@ -58,13 +63,20 @@ def wczytaj(filename):#/mne_lib
     eeg_20 = eeg_mont.copy()
     eeg_20.pick_channels(chosen_channels)
 
+    #--------------interpolacja cz.2. na razie tylko dla przykładowego sygnału
+    eeg_20.interpolate_bads(reset_bads=False)
+    print("przed referencją")
+
+
     #average reference as projection
     eeg_20.set_eeg_reference('average', projection=True)
 
     # ## FILTROWANIE
     #1 Hz bo tak robią w tutorialach mnne xd
     eeg_20.filter(1, None, l_trans_bandwidth='auto', filter_length='auto', phase='zero', fir_window='hamming', n_jobs=16)
-    eeg_20.filter(None, 49, l_trans_bandwidth='auto', filter_length='auto', phase='zero', fir_window='hamming', n_jobs=16)
+    eeg_20.notch_filter(freqs=50, filter_length='auto', phase='zero', method="iir")
+
+    #eeg_20.filter(None, 49, l_trans_bandwidth='auto', filter_length='auto', phase='zero', fir_window='hamming', n_jobs=16)
 
     #eeg_20.plot(proj=True)
     
@@ -170,7 +182,7 @@ def detektor_bs(syg, option = 'numpy'): #/mne_library
         method = 'fastica' #wybrana metoda ICA
         
         
-        n_components = 19  
+        n_components = 17 #19
         decim = 3  
         random_state = 15
         
@@ -196,11 +208,12 @@ def detektor_bs(syg, option = 'numpy'): #/mne_library
        
 if __name__ == '__main__':
     for f in os.listdir('.'):
-        pattern = "sub-ARZ000_task_art_watch"+".*\.vhdr$"
+        #ARZ000
+        pattern = "sub-CKA387_task_art_watch"+".*\.vhdr$"
         if re.match(pattern, f):
             current_signal = wczytaj(f)
             print("po pierwszej funkcji")
             a = detektor_bs(current_signal, 'mne_lib')
-            detektor_bs(current_signal, 'numpy')
+            #detektor_bs(current_signal, 'numpy')
             print(a)
             
