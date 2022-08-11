@@ -77,12 +77,12 @@ def axes_formatting(ax, x_axis):
     # ax.set_xlim(X_AXIS["min"], x_axis["max"])
     # ax.spines["bottom"].set_position(('data', Y_AXIS["min"]))
 
-    if x_axis["max"] < 1:
-        labels = map(lambda x: "{:.2f}".format(x), x_majors)
-    else:
-        labels = map(lambda x: "{:.1f}".format(x), x_majors)
-    ax.set_xticks(x_majors)
-    ax.set_xticklabels(labels)
+    # if x_axis["max"] < 1:
+    #     labels = map(lambda x: "{:.2f}".format(x), x_majors)
+    # else:
+    #     labels = map(lambda x: "{:.1f}".format(x), x_majors)
+    # ax.set_xticks(x_majors)
+    # ax.set_xticklabels(labels)
 
     # Format labels
     for label in ax.get_yticklabels():
@@ -127,8 +127,8 @@ def plot_hist_inter(epoch_list, output_path, Fs=1000):
             values.append(np.abs(st_idx - end_idx) / Fs)
 
     x_axis = {"min": 0, "max": np.ceil(max(values)), "step": 0.5}
-    ax.hist(values, 20, linewidth=LINEWIDTH, color='k', fill=False)
-    #TODO jakoś obliczyć ile jest za 0.3, 0.5 s
+    ax.hist(values, linewidth=LINEWIDTH, color='k', fill=False)
+    # TODO jakoś obliczyć ile jest za 0.3, 0.5 s
     ax.axvline(0.3, linewidth=LINEWIDTH * 0.5, color="grey", linestyle="--")
     ax.axvline(0.5, linewidth=LINEWIDTH * 0.5, color="grey", linestyle=":")
     axes_formatting(ax, x_axis)

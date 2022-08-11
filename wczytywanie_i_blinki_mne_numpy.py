@@ -42,8 +42,8 @@ def wczytaj(filename):#/mne_lib
     #print(mapa)
 
     #--------------interpolacja na razie tylko do sprawdzenia złego sygnału
-    eeg.info['bads'].append('F8')
-    eeg.info['bads'].append('T7')
+    # eeg.info['bads'].append('F8')
+    # eeg.info['bads'].append('T7')
     print(eeg.info['bads'])
     
     eeg_mont = eeg.copy().set_montage(mapa)
@@ -64,7 +64,7 @@ def wczytaj(filename):#/mne_lib
     eeg_20.pick_channels(chosen_channels)
 
     #--------------interpolacja cz.2. na razie tylko dla przykładowego sygnału
-    eeg_20.interpolate_bads(reset_bads=False)
+    # eeg_20.interpolate_bads(reset_bads=False)
     print("przed referencją")
 
 
@@ -76,7 +76,7 @@ def wczytaj(filename):#/mne_lib
     eeg_20.filter(1, None, l_trans_bandwidth='auto', filter_length='auto', phase='zero', fir_window='hamming', n_jobs=16)
     eeg_20.notch_filter(freqs=50, filter_length='auto', phase='zero', method="iir")
 
-    #eeg_20.filter(None, 49, l_trans_bandwidth='auto', filter_length='auto', phase='zero', fir_window='hamming', n_jobs=16)
+    eeg_20.filter(None, 80, l_trans_bandwidth='auto', filter_length='auto', phase='zero', fir_window='hamming', n_jobs=16)
 
     #eeg_20.plot(proj=True)
     

@@ -3,7 +3,7 @@ import shutil
 import re
 
 from wczytywanie_i_blinki_mne_numpy import wczytaj, detektor_bs
-from epochs import epochs_factory
+from epochs import EpochsListInCase
 from plot_epochs import plot_ica_epochs
 from plot_ch_epochs import plot_channels_epochs
 from plot_his import plot_hist, plot_hist_inter
@@ -24,10 +24,11 @@ def clean_directory(dir_path):
 if __name__ == "__main__":
 
     # Tworzenie obrazków z epokami z ica[1]
-    path = "./Data"
-    output = "./output"
+    path = "Data"
+    output = "output"
     clean_directory(output)
     file_list = os.listdir(path)
+    epoch_service = EpochsListInCase()
 
     for f in file_list:
         pattern = "sub-.*_task_art_watch" + ".*\.vhdr$"
@@ -47,7 +48,7 @@ if __name__ == "__main__":
             ica = detektor_bs(signal_from_mne, "mne_lib")
 
             df = signal_from_mne.annotations.to_data_frame()
-            epoch_list = epochs_factory(df, signal_from_mne, ica)
+            epoch_list = epoch_service.epochs_factory(df, signal_from_mne, ica)
             epoch_list.reverse()
 
             case = re.findall("-(.*?)t", f)[0]

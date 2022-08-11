@@ -144,17 +144,63 @@ class ExtractEventInfo:
         return props_dict
 
 
-def epochs_factory(df, sig_from_mne, ica):
-    start_time = df.onset[0]
-    end_time = df.onset.iloc[-1]
-    epoch_list = []
-    extractor = ExtractEventInfo(start_time, end_time)
-    img_events = df.loc[df.description.str.contains("/P")]
-    for idx, row in img_events.reindex().sort_index(ascending=False).iterrows():
-        e = Epoch(extractor(idx, row))
-        e.signal = sig_from_mne
-        e.ica = ica[1][0][0]
-        e.find_saccades()
-        epoch_list.append(e)
+class EpochsListInCase:
+    """
+    The purpose of this class is to
+    load and maintain the epochs in single case.
 
-    return epoch_list
+    Only one instance of class in pipeline needed.
+
+    methods:
+        epochs_factory()
+
+        get series()
+
+    """
+    def __init__(self):
+        self._epoch_list = []
+        self._n_epochs = 0
+
+    def __getitem__(self, i):
+        return self._epoch_list[i]
+
+    def __iter__(self):
+        self.__i = 0
+        return self
+
+    def __next__(self):
+        if self.__i < self._n_epochs:
+            self.__i += 1
+            return self._epoch_list[self.__i - 1]
+        else:
+            raise StopIteration
+
+    def __len__(self):
+        return len(self._epoch_list)
+
+    def epochs_factory(self, df, sig_from_mne, ica):
+        start_time = df.onset[0]
+        end_time = df.onset.iloc[-1]
+
+        # clear epoch list
+        self._epoch_list = []
+        extractor = ExtractEventInfo(start_time, end_time)
+        img_events = df.loc[df.description.str.contains("/P")]
+        for idx, row in img_events.reindex().sort_index(ascending=False).iterrows():
+            e = Epoch(extractor(idx, row))
+            e.signal = sig_from_mne
+            e.ica = ica[3][0][0]
+            e.find_saccades()
+            self._epoch_list.append(e)
+
+        self._n_epochs = len(self)
+        return self._epoch_list
+
+    def get_series(self, n_series):
+
+        for e in self._epoch_list:
+            if e.series == n_series:
+                pass
+                # zwróć w macierzy odpowiednie odcinki czy jakoś tak
+
+
