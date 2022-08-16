@@ -135,5 +135,4 @@ dmypy.json
 *.eeg
 *.vhdr
 *.vmrk
-*.txt
 .Data/

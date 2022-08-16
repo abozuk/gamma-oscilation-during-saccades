@@ -178,7 +178,7 @@ class EpochsListInCase:
     def __len__(self):
         return len(self._epoch_list)
 
-    def epochs_factory(self, df, sig_from_mne, ica):
+    def epochs_factory(self, df, sig_from_mne, ica, ica_ch):
         start_time = df.onset[0]
         end_time = df.onset.iloc[-1]
 
@@ -189,18 +189,27 @@ class EpochsListInCase:
         for idx, row in img_events.reindex().sort_index(ascending=False).iterrows():
             e = Epoch(extractor(idx, row))
             e.signal = sig_from_mne
-            e.ica = ica[3][0][0]
+            e.ica = ica[ica_ch][0][0]
             e.find_saccades()
             self._epoch_list.append(e)
 
         self._n_epochs = len(self)
         return self._epoch_list
 
-    def get_series(self, n_series):
-
+    def get_series(self, n_series, Fs=1000):
+        list_of_array = []
         for e in self._epoch_list:
-            if e.series == n_series:
-                pass
+            if int(e.series) == n_series:
+                starts, ends = e.inter_saccades_idx
+                for st_idx, end_idx in zip(starts, ends):
+                    _len = np.abs(st_idx - end_idx) / Fs
+                    if _len > 0.3:
+                        list_of_array.append(e.signal[st_idx:end_idx])
+
+        return list_of_array
+
+
+
                 # zwróć w macierzy odpowiednie odcinki czy jakoś tak
 
 

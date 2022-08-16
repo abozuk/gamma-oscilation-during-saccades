@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as font_manager
+from scipy.stats import percentileofscore
 
 C_DPI = 300
 
@@ -128,9 +129,14 @@ def plot_hist_inter(epoch_list, output_path, Fs=1000):
 
     x_axis = {"min": 0, "max": np.ceil(max(values)), "step": 0.5}
     ax.hist(values, linewidth=LINEWIDTH, color='k', fill=False)
-    # TODO jakoś obliczyć ile jest za 0.3, 0.5 s
-    ax.axvline(0.3, linewidth=LINEWIDTH * 0.5, color="grey", linestyle="--")
-    ax.axvline(0.5, linewidth=LINEWIDTH * 0.5, color="grey", linestyle=":")
+
+    precentile = round(percentileofscore(values, 0.3), 2)
+    ax.axvline(0.3, label="0.3 s; {}%".format(precentile),
+               linewidth=LINEWIDTH * 0.5, color="grey", linestyle="--")
+    precentile = round(percentileofscore(values, 0.5), 2)
+    ax.axvline(0.5, label="0.5 s; {}%".format(precentile),
+               linewidth=LINEWIDTH * 0.5, color="grey", linestyle=":")
+    ax.legend(loc="upper right", prop=C_DEFAULT_FONT_PROP)
     axes_formatting(ax, x_axis)
     ax.set_xlabel(X_LABEL_LEN,
                   fontsize=C_DEFAULT_FONT_SIZE,
