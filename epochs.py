@@ -202,17 +202,21 @@ class EpochsListInCase:
             if int(e.series) == n_series:
                 starts, ends = e.inter_saccades_idx
                 for st_idx, end_idx in zip(starts, ends):
-                    _len = np.abs(st_idx - end_idx) / Fs
-                    if _len > 0.3:
+                    _len = np.abs(st_idx - end_idx)
+                    if _len > section_len:
                         _arr = np.zeros((e.signal.shape[0], section_len))
                         for ch in range(_arr.shape[0]):
-                            _s = e.signal[ch,st_idx:end_idx]
-                            _s_x = np.arange(st_idx, end_idx)
-
-                            _x = np.arange(st_idx, end_idx, np.abs(st_idx - end_idx)/section_len)
-                            if _x.size > section_len:
-                                _x = _x[:section_len]
-                            _arr[ch, :] = np.interp(_x, _s_x, _s)
+                            _s = e.signal[ch,st_idx:st_idx + section_len]
+                            _arr[ch, :] = _s
+                            # _s_x = np.arange(st_idx, end_idx)
+                            # if _s_x.size > _s.size:
+                            #     _s_x = _s_x[:_s_x.size]
+                            #     print("poprawa", _s_x.size)
+                            #
+                            # _x = np.arange(st_idx, end_idx, np.abs(st_idx - end_idx)/section_len)
+                            # if _x.size > section_len:
+                            #     _x = _x[:section_len]
+                            # _arr[ch, :] = np.interp(_x, _s_x, _s)
 
                         list_of_array.append(_arr)
 

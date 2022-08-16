@@ -61,7 +61,7 @@ def wczytaj(filename):#/mne_lib
 
     #wybór 19 kanałóW
     eeg_20 = eeg_mont.copy()
-    eeg_20.pick_channels(chosen_channels)
+    eeg_20.pick_channels(chosen_channels) #TODO!!!
 
     #--------------interpolacja cz.2. na razie tylko dla przykładowego sygnału
     # eeg_20.interpolate_bads(reset_bads=False)
