@@ -196,7 +196,7 @@ class EpochsListInCase:
         self._n_epochs = len(self)
         return self._epoch_list
 
-    def get_series(self, n_series, Fs=1000):
+    def get_series(self, n_series, section_len=500, Fs=1000):
         list_of_array = []
         for e in self._epoch_list:
             if int(e.series) == n_series:
@@ -204,7 +204,17 @@ class EpochsListInCase:
                 for st_idx, end_idx in zip(starts, ends):
                     _len = np.abs(st_idx - end_idx) / Fs
                     if _len > 0.3:
-                        list_of_array.append(e.signal[st_idx:end_idx])
+                        _arr = np.zeros((e.signal.shape[0], section_len))
+                        for ch in range(_arr.shape[0]):
+                            _s = e.signal[ch,st_idx:end_idx]
+                            _s_x = np.arange(st_idx, end_idx)
+
+                            _x = np.arange(st_idx, end_idx, np.abs(st_idx - end_idx)/section_len)
+                            if _x.size > section_len:
+                                _x = _x[:section_len]
+                            _arr[ch, :] = np.interp(_x, _s_x, _s)
+
+                        list_of_array.append(_arr)
 
         return list_of_array
 

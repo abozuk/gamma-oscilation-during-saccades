@@ -65,7 +65,7 @@ if __name__ == "__main__":
             # TUTAJ LISTA ODCINKÓW
             for s in [1, 2]:
                 list_of_sacceds_from_case = epoch_service.get_series(s)
-                print("Liczba odcinków:", len(list_of_sacceds_from_case))
+                print("Liczba odcinków:", len(list_of_sacceds_from_case), list_of_sacceds_from_case[0].shape)
 
             case = re.findall("-(.*?)t", f)[0]
             output_path = os.path.join(output, case[:-1])
