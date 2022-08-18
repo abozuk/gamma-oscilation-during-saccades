@@ -9,9 +9,10 @@ SKA974_task_art_watch1
 SKA974_task_art_watch2
 SKI089_task_art_watch1
 SKI089_task_art_watch2
+SKI864_task_art_watch1
+SKI864_task_art_watch2
 SKI994_task_art_watch1
 SKI994_task_art_watch2
-TAT562_task_art_watch2
 ZEK799_task_art_watch1
 ZEK799_task_art_watch2
 ZYK128_task_art_watch1
