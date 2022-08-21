@@ -8,8 +8,8 @@ from epochs import EpochsListInCase
 from plot_epochs import plot_ica_epochs
 from plot_ch_epochs import plot_channels_epochs
 from plot_his import plot_hist, plot_hist_inter
-from time_freq import time_freq_spectogram, time_freq_scipy
-
+from time_freq import time_freq_spectogram, time_freq_scipy,time_freq_mne
+import numpy as np
 
 def read_json(path):
     f = open(path)
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     # Tworzenie obrazków z epokami z ica[1]
     path = "Data"
     output = "output"
-    # clean_directory(output)
+    #clean_directory(output)
     file_list = os.listdir(path)
     epoch_service = EpochsListInCase()
 
@@ -46,6 +46,7 @@ if __name__ == "__main__":
 
         if re.match(pattern, f):
             fname = os.path.join(path, f)
+            print(fname)
             try:
                 signal_from_mne = wczytaj(fname)
             except:
@@ -66,9 +67,10 @@ if __name__ == "__main__":
 
 
             case = re.findall("-(.*?)t", f)[0]
+            print("case ", case)
             output_path = os.path.join(output, case[:-1])
             if not os.path.exists(output_path):
-                os.mkdir(output_path)
+                os.makedirs(os.path.join(os.getcwd(),output_path))
 
             plot_fname = "ica_"
             plot_fname += case
@@ -79,10 +81,14 @@ if __name__ == "__main__":
             plot_path = os.path.join(output_path, plot_fname)
 
             # TUTAJ LISTA ODCINKÓW
-            for s in [1, 2]:
+            #freqs = np.arange(20., 80., 1.)
+            for s in [1,2]:
+                #print("S: ", type(s))
                 list_of_sacceds_from_case = epoch_service.get_series(s)
-                print("Liczba odcinków:", len(list_of_sacceds_from_case), list_of_sacceds_from_case[0].shape)
+                #print(type(list_of_sacceds_from_case))
+                #print("Liczba odcinków:", len(list_of_sacceds_from_case), list_of_sacceds_from_case[0].shape)
                 time_freq_scipy(list_of_sacceds_from_case)
+                #time_freq_mne(list_of_sacceds_from_case, freqs)
             # plot_ica_epochs(epoch_list, Fs, plot_path, True)
             # plot_hist(epoch_list, os.path.join(output_path, plot_fname.replace("ica", "hist")))
             # plot_hist_inter(epoch_list,

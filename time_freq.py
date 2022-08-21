@@ -63,22 +63,39 @@ def cwt(x, MinF, MaxF, Fs, w=7.0, df=1.0, plot=False):
 
 def time_freq_scipy(signal):
     widths = np.arange(5, 100)
-    print("SIGAL", len(signal))
+    print("SIGNAL", len(signal))
 
     # py.figure()
     # py.imshow(np.abs(cwtmatr), extent=[0, 10, 0, 60], cmap='PRGn', aspect='auto', vmax=abs(cwtmatr).max(),
     #           vmin=-abs(cwtmatr).max())
+    fig, ax = plt.subplots(5,5,figsize=C_FIGSIZE)
+    # row = 0
+    # col = 0
 
-    for ch in range(17,19):
-        fig, ax = plt.subplots(figsize=C_FIGSIZE)
+    #preparing matrix of indexes, to make a kind of a topomap out of tf maps
+    idx_matrix = np.zeros((5, 5))
+    idx_matrix[1:4, :] = 1
+    idx_matrix[:, 1] = 1
+    idx_matrix[:, 3] = 1
+
+    nz = np.nonzero(idx_matrix)
+
+    chosen_channels = ['Fp1', 'Fp2',
+                       'F7', 'F3', 'Fz', 'F4', 'F8',
+                       'T7', 'C3', 'Cz', 'C4', 'T8',
+                       'P7', 'P3', 'Pz', 'P4', 'P8',
+                       'O1', 'O2']
+
+    for ch in range(19):
+
         P_all = 0
         for e_i in range(len(signal)):
-            print(e_i)
+            #print(e_i)
             _s = signal[e_i][ch, :]
             # P, freq, t, im1 = py.specgram(_s, NFFT=NFFT, Fs=Fs, window=window, noverlap=NFFT - 1,
             #                               sides='onesided')
             cwtmatr, f, t = cwt(_s, 20, 80, 1000, 10)
-            print(cwtmatr.shape)
+            #print(cwtmatr.shape)
 
             P_all += np.abs(cwtmatr)
         P_all = np.log(P_all / len(signal))
@@ -89,9 +106,15 @@ def time_freq_scipy(signal):
         # py.imshow(P_all, aspect='auto', origin='lower',
         #           extent=(t[0], t[-1], 20, 80), interpolation='nearest')
         # figname = plot_name.replace("ica", "ch_" + str(ch) + "_")
-        py.imshow(P_all, extent=[0, 0.5, 20, 80],  aspect='auto', origin='lower')
+        ax[nz[0][ch], nz[1][ch]].imshow(P_all, extent=[0, 0.5, 20, 80],  aspect='auto', origin='lower')
+        ax[nz[0][ch], nz[1][ch]].title.set_text(chosen_channels[ch])
         # py.imshow(P, aspect='auto', origin='lower', extent=(0, T, MinF, MaxF))
-        py.show()
+
+    fig.suptitle("Signal name")
+    #fig.tight_layout()
+    fig.subplots_adjust(top = 0.88, hspace = 0.5)
+
+    py.show()
 
 
 # tu wersje z mne, ale mam problem z wczytaniem naszego sygnału jako "epoch":
