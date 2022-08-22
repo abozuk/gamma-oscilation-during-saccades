@@ -62,6 +62,8 @@ def wczytaj(filename):#/mne_lib
     #wybór 19 kanałóW
     eeg_20 = eeg_mont.copy()
     eeg_20.pick_channels(chosen_channels) #TODO!!!
+    # CHANNELS ORDER
+    # [Fp1, Fp2, F7, F3, Fz, F4, F8, T7, C3, Cz, C4, T8, P7, P3, Pz, P4, P8, O1, O2]
 
     #--------------interpolacja cz.2. na razie tylko dla przykładowego sygnału
     # eeg_20.interpolate_bads(reset_bads=False)
@@ -182,7 +184,7 @@ def detektor_bs(syg, option = 'numpy'): #/mne_library
         method = 'fastica' #wybrana metoda ICA
         
         
-        n_components = 17 #19
+        n_components = 19
         decim = 3  
         random_state = 15
         
