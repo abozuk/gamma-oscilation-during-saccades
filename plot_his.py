@@ -151,5 +151,7 @@ def plot_hist_inter(epoch_list, output_path, Fs=1000):
     prop = dict(left=0.14, top=0.98, bottom=0.18, right=0.97)
     plt.subplots_adjust(**prop)
     plt.savefig(output_path, dpi=C_DPI)
+    if len(e.inter_saccades_idx) == 0:
+        print("TUTAJ!!!!!!!!!!!!!!!!!!",output_path)
     plt.clf()
     plt.close()

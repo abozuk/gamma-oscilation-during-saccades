@@ -21,7 +21,8 @@ class Epoch:
                                                      self.image_number)
 
     def __repr__(self):
-        return self.series + self.image_number
+        return "series: {}, image number: {}".format(self.series,
+                                                     self.image_number)
 
     @property
     def event_idx(self):
@@ -93,13 +94,18 @@ class Epoch:
         _breaks = np.where(np.diff(self._saccades_idx) > 1)[0]
         _deleted = 0
         for i_ in range(_breaks.size - 1):
-            arr_std = np.std(self._ica[self._saccades_idx[_breaks[i_] - _deleted:_breaks[i_ + 1] - _deleted]])
+            try:
+                arr_std = np.std(self._ica[self._saccades_idx[_breaks[i_] - _deleted:_breaks[i_ + 1] - _deleted]])
+            except:
+                print("Nie da się usunąć!")
+                continue
 
             if np.abs(arr_std) < np.mean(np.abs(self._ica[self._saccades_idx])) * 0.95:
                 self._saccades_idx = np.delete(self._saccades_idx,
                                                range(_breaks[i_] - _deleted, _breaks[i_ + 1] - _deleted))
                 _deleted += _breaks[i_ + 1] - _breaks[i_]
 
+        # print(self.series, self.image_number, self._saccades_idx.size)
         self._locate_saccades()
 
         return sacc_sig, self._saccades_idx
@@ -113,16 +119,19 @@ class Epoch:
         starts.extend(ssacc[where_stops + 1])
         starts = np.array(starts[:-1])
         self._loc_saccades_idx = (starts, ends)
+
         self._locate_inter_saccades(ssacc, where_stops, ends)
         return starts, ends
 
     def _locate_inter_saccades(self, ssacc, where_stops, ends):
         if self._loc_saccades_idx[0].size == 0:
             self._inter_saccades_idx = ([0], [self.signal.size])
+
             return 0
         elif self._loc_saccades_idx[0][0] == 0:
             inter_starts = [0]
         else:
+
             inter_starts = []
 
         inter_starts.extend(ends)
