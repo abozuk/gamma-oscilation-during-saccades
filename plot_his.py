@@ -75,7 +75,7 @@ def axes_formatting(ax, x_axis):
     # ax.set_yticklabels(labels)
 
     # Limits and ticks for x-axis
-    # ax.set_xlim(X_AXIS["min"], x_axis["max"])
+    # ax.set_xlim(x_axis["min"], x_axis["max"])
     # ax.spines["bottom"].set_position(('data', Y_AXIS["min"]))
 
     # if x_axis["max"] < 1:
@@ -102,7 +102,7 @@ def plot_hist(epoch_list, output_path):
 
     x_axis = {"min": min(values), "max": max(values), "step": 0.1}
 
-    ax.hist(values, color='k', fill=False)
+    ax.hist(values, bins=20, color='k', fill=False)
     axes_formatting(ax, x_axis)
     ax.set_xlabel(X_LABEL,
                   fontsize=C_DEFAULT_FONT_SIZE,
@@ -125,15 +125,17 @@ def plot_hist_inter(epoch_list, output_path, Fs=1000):
     for e in epoch_list:
         starts, ends = e.inter_saccades_idx
         for st_idx, end_idx in zip(starts, ends):
-            values.append(np.abs(st_idx - end_idx) / Fs)
+            _v = np.abs(st_idx - end_idx) / Fs
+            if _v < 11:
+                values.append(_v)
 
-    x_axis = {"min": 0, "max": np.ceil(max(values)), "step": 0.5}
-    ax.hist(values, linewidth=LINEWIDTH, color='k', fill=False)
+    x_axis = {"min": 0, "max": 2, "step": 0.1}
+    ax.hist(values, bins=80, linewidth=LINEWIDTH, color='k', fill=False)
 
-    precentile = round(percentileofscore(values, 0.3), 2)
+    precentile = round(100 - percentileofscore(values, 0.3), 2)
     ax.axvline(0.3, label="0.3 s; {}%".format(precentile),
                linewidth=LINEWIDTH * 0.5, color="grey", linestyle="--")
-    precentile = round(percentileofscore(values, 0.5), 2)
+    precentile = round(100 - percentileofscore(values, 0.5), 2)
     ax.axvline(0.5, label="0.5 s; {}%".format(precentile),
                linewidth=LINEWIDTH * 0.5, color="grey", linestyle=":")
     ax.legend(loc="upper right", prop=C_DEFAULT_FONT_PROP)

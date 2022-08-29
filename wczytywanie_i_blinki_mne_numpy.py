@@ -182,7 +182,7 @@ def detektor_bs(syg, option = 'numpy'): #/mne_library
         method = 'fastica' #wybrana metoda ICA
         
         
-        n_components = 17 #19
+        n_components = 19
         decim = 3  
         random_state = 15
         

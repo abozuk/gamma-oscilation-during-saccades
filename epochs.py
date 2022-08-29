@@ -81,12 +81,25 @@ class Epoch:
 
     def find_saccades(self):
         sacc_sig = self._ica
+        saccades_list = []
+        for i in [0.05, 0.1, 0.2, 0.4]:
+            idx_to_diff = int(i * self._Fs)  # Jako argument?
+            min_dff = get_min_diff(sacc_sig, idx_to_diff)
+            max_dff = get_max_diff(sacc_sig, idx_to_diff)
+            saccades_list.append(find_saccades(sacc_sig, self._Fs, min_dff, max_dff))
 
-        idx_to_diff = int(0.2 * self._Fs)  # Jako argument?
+        self._saccades_idx = np.concatenate((saccades_list))
+        self._saccades_idx = np.unique(self._saccades_idx)
+        _breaks = np.where(np.diff(self._saccades_idx) > 1)[0]
+        _deleted = 0
+        for i_ in range(_breaks.size - 1):
+            arr_std = np.std(self._ica[self._saccades_idx[_breaks[i_] - _deleted:_breaks[i_ + 1] - _deleted]])
 
-        min_dff = get_min_diff(sacc_sig, idx_to_diff)
-        max_dff = get_max_diff(sacc_sig, idx_to_diff)
-        self._saccades_idx = find_saccades(sacc_sig, self._Fs, min_dff, max_dff)
+            if np.abs(arr_std) < np.mean(np.abs(self._ica[self._saccades_idx])) * 0.95:
+                self._saccades_idx = np.delete(self._saccades_idx,
+                                               range(_breaks[i_] - _deleted, _breaks[i_ + 1] - _deleted))
+                _deleted += _breaks[i_ + 1] - _breaks[i_]
+
         self._locate_saccades()
 
         return sacc_sig, self._saccades_idx
@@ -196,7 +209,7 @@ class EpochsListInCase:
         self._n_epochs = len(self)
         return self._epoch_list
 
-    def get_series(self, n_series, section_len=500, Fs=1000):
+    def get_series(self, n_series, section_len=500):
         list_of_array = []
         for e in self._epoch_list:
             if int(e.series) == n_series:
@@ -206,17 +219,8 @@ class EpochsListInCase:
                     if _len > section_len:
                         _arr = np.zeros((e.signal.shape[0], section_len))
                         for ch in range(_arr.shape[0]):
-                            _s = e.signal[ch,st_idx:st_idx + section_len]
+                            _s = e.signal[ch, st_idx:st_idx + section_len]
                             _arr[ch, :] = _s
-                            # _s_x = np.arange(st_idx, end_idx)
-                            # if _s_x.size > _s.size:
-                            #     _s_x = _s_x[:_s_x.size]
-                            #     print("poprawa", _s_x.size)
-                            #
-                            # _x = np.arange(st_idx, end_idx, np.abs(st_idx - end_idx)/section_len)
-                            # if _x.size > section_len:
-                            #     _x = _x[:section_len]
-                            # _arr[ch, :] = np.interp(_x, _s_x, _s)
 
                         list_of_array.append(_arr)
 
