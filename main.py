@@ -2,6 +2,8 @@ import os
 import shutil
 import re
 import json
+import csv
+import pandas as pd
 
 from wczytywanie_i_blinki_mne_numpy import wczytaj, detektor_bs
 from epochs import EpochsListInCase
@@ -41,9 +43,13 @@ if __name__ == "__main__":
 
     ica_order = read_json("ica_order.json")
 
+    data = np.zeros((120,2,19,60,500)) #[osoba, seria, kanał, częstość, czas]
+
+    #print("data shape:", data.shape)
+    idx = 0
     for f in file_list:
         pattern = "sub-.*_task_art_watch" + ".*\.vhdr$"
-
+        #if i <= 1:
         if re.match(pattern, f):
             fname = os.path.join(path, f)
             print(fname)
@@ -60,7 +66,18 @@ if __name__ == "__main__":
             ica = detektor_bs(signal_from_mne, "mne_lib")
 
             df = signal_from_mne.annotations.to_data_frame()
-            ica_ch = ica_order[f]
+            try:
+                ica_ch = ica_order[f]
+            except:
+                continue
+
+
+            plik_z_nazwami = open(os.path.join(output, "pliki.csv"), "w")
+            writer = csv.writer(plik_z_nazwami)
+            writer.writerow([idx, fname[9:-5]])
+            plik_z_nazwami.close()
+            idx+=1
+
             epoch_list = epoch_service.epochs_factory(df, signal_from_mne, ica, ica_ch)
             epoch_list.reverse()
 
@@ -87,7 +104,9 @@ if __name__ == "__main__":
                 list_of_sacceds_from_case = epoch_service.get_series(s)
                 #print(type(list_of_sacceds_from_case))
                 #print("Liczba odcinków:", len(list_of_sacceds_from_case), list_of_sacceds_from_case[0].shape)
-                time_freq_scipy(list_of_sacceds_from_case)
+                #data = np.array((120, 2, 19, 500, 60))  # [osoba, seria, kanał, czas, częstość]
+                data[idx, s - 1, :, :, :] = time_freq_scipy(list_of_sacceds_from_case)#, os.path.join(output_path, plot_fname.replace("ica", "cwt_series_"+str(s))), plot_fname.replace("ica", "cwt_series_"+str(s)))
+
                 #time_freq_mne(list_of_sacceds_from_case, freqs)
             # plot_ica_epochs(epoch_list, Fs, plot_path, True)
             # plot_hist(epoch_list, os.path.join(output_path, plot_fname.replace("ica", "hist")))
@@ -95,3 +114,6 @@ if __name__ == "__main__":
             #                 os.path.join(output_path,
             #                              plot_fname.replace("ica", "inter_saccades_hist")))
             # plot_channels_epochs(epoch_list, Fs, plot_path)
+        #i += 1
+
+    np.save(os.path.join(output, "data.npy"), data)

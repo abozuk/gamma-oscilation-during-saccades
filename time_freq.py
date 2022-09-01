@@ -4,11 +4,105 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mne.time_frequency import tfr_multitaper, tfr_stockwell, tfr_morlet, tfr_array_morlet
 
+import matplotlib.font_manager as font_manager
+
+
+C_DPI = 300
+
+C_DEFAULT_FONT_PATH = '/usr/share/fonts/truetype/msttcorefonts/Arial.ttf'
+#C_DEFAULT_FONT_PATH = 'C:\Windows\Fonts\Arial.ttf'
+
+C_DEFAULT_FONT_SIZE = 8
+C_DEFAULT_FONT_PROP = font_manager.FontProperties(fname=C_DEFAULT_FONT_PATH,
+                                                  size=C_DEFAULT_FONT_SIZE)
+
+
+Y_LABEL = r'ica'
+X_LABEL = r'time [s]'
+
+LINEWIDTH = 1
+LABELPAD = 2
+TICKS_LEN = 2
+
+X_AXIS = {"min": 0, "max": 25, "step": 5}  # values for ticks
+Y_AXIS = {"min": -5, "max": 5, "step": 5}
+
+N_COLUMNS = 3
+
+
 def cm2inch(x):
     return x * 0.39
 
 
-C_FIGSIZE = (cm2inch(7), cm2inch(28))
+C_FIGSIZE = (cm2inch(50), cm2inch(19))
+
+def axes_formatting(ax):
+    """
+    Details for the axis
+    """
+    y_majors = np.arange(Y_AXIS["min"],
+                         Y_AXIS["max"] + Y_AXIS["step"],
+                         Y_AXIS["step"])
+
+    x_majors = np.arange(X_AXIS["min"],
+                         X_AXIS["max"] + X_AXIS["step"],
+                         X_AXIS["step"])
+
+    # Distance between ticks and label of ticks
+    ax.tick_params(
+        axis="y",
+        which="major",
+        pad=LABELPAD,
+        length=TICKS_LEN,
+        width=1,
+        left="off",
+        labelleft="off",
+        direction="in")
+
+    ax.tick_params(
+        axis='x',
+        which='major',
+        pad=LABELPAD,
+        length=TICKS_LEN,
+        width=1,
+        left="off",
+        labelleft="off",
+        direction="in")
+
+    # Make rightline invisible
+    ax.spines["right"].set_visible(False)
+    ax.spines["top"].set_visible(False)
+
+    # Limits and ticks for y-axis
+    ax.set_ylim(Y_AXIS["min"], Y_AXIS["max"])
+    ax.spines["left"].set_position(('data', 0))
+
+    labels = map(lambda x: "{:.0f}".format(x), y_majors)
+    ax.set_yticks(y_majors)
+    ax.set_yticklabels(labels)
+
+    # Limits and ticks for x-axis
+    ax.set_xlim(X_AXIS["min"], X_AXIS["max"])
+    ax.spines["bottom"].set_position(('data', Y_AXIS["min"]))
+
+    labels = map(lambda x: "{:.0f}".format(x), x_majors)
+    ax.set_xticks(x_majors)
+    ax.set_xticklabels(labels)
+
+
+    # Format labels
+    for label in ax.get_yticklabels():
+        label.set_fontproperties(C_DEFAULT_FONT_PROP)
+        label.set_fontsize(C_DEFAULT_FONT_SIZE)
+    for label in ax.get_xticklabels():
+        label.set_fontproperties(C_DEFAULT_FONT_PROP)
+        label.set_fontsize(C_DEFAULT_FONT_SIZE)
+
+# def cm2inch(x):
+#     return x * 0.39
+#
+#
+# C_FIGSIZE = (cm2inch(7), cm2inch(28))
 
 def time_freq_spectogram(signal, Fs, NFFT, plot_name):
     print("Spectogram")
@@ -59,33 +153,37 @@ def cwt(x, MinF, MaxF, Fs, w=7.0, df=1.0, plot=False):
     if plot:
         py.imshow(P, aspect='auto', origin='lower', extent=(0, T, MinF, MaxF))
         py.show()
-    return P, f, t
+    return P, freqs, t
 
-def time_freq_scipy(signal):
+def time_freq_scipy(signal):#, out_path, plot_name):
     widths = np.arange(5, 100)
     print("SIGNAL", len(signal))
+    T = len(signal[0][0, :]) / 1000
 
+    t = np.arange(0, T, 1. / 1000)
+    freqs = np.arange(20, 80, 1.0)
     # py.figure()
     # py.imshow(np.abs(cwtmatr), extent=[0, 10, 0, 60], cmap='PRGn', aspect='auto', vmax=abs(cwtmatr).max(),
     #           vmin=-abs(cwtmatr).max())
-    fig, ax = plt.subplots(5,5,figsize=C_FIGSIZE)
-    # row = 0
-    # col = 0
 
-    #preparing matrix of indexes, to make a kind of a topomap out of tf maps
-    idx_matrix = np.zeros((5, 5))
-    idx_matrix[1:4, :] = 1
-    idx_matrix[:, 1] = 1
-    idx_matrix[:, 3] = 1
+    # PLOTTING TO NEW FUNCTION
+    # fig, ax = plt.subplots(5,5,figsize=C_FIGSIZE)
+    #
+    # #preparing matrix of indexes, to make a kind of a topomap out of tf maps
+    # idx_matrix = np.zeros((5, 5))
+    # idx_matrix[1:4, :] = 1
+    # idx_matrix[:, 1] = 1
+    # idx_matrix[:, 3] = 1
 
-    nz = np.nonzero(idx_matrix)
 
+    #nz = np.nonzero(idx_matrix)
+    #########################################################################
     chosen_channels = ['Fp1', 'Fp2',
                        'F7', 'F3', 'Fz', 'F4', 'F8',
                        'T7', 'C3', 'Cz', 'C4', 'T8',
                        'P7', 'P3', 'Pz', 'P4', 'P8',
                        'O1', 'O2']
-
+    powers = np.zeros((19,60,500))
     for ch in range(19):
 
         P_all = 0
@@ -96,9 +194,13 @@ def time_freq_scipy(signal):
             #                               sides='onesided')
             cwtmatr, f, t = cwt(_s, 20, 80, 1000, 10)
             #print(cwtmatr.shape)
-
+            #if ch == 0 and e_i == 0:
+                #print( "czas: ", t, "\n","częstość: ", f)
             P_all += np.abs(cwtmatr)
         P_all = np.log(P_all / len(signal))
+        #print("moc: ", P_all.shape)
+        powers[ch,:,:] = P_all
+        print("channel: ", ch+1)
         # P_all = P_all[2:8]  # TODO
 
         # print(P_all.shape)
@@ -106,15 +208,27 @@ def time_freq_scipy(signal):
         # py.imshow(P_all, aspect='auto', origin='lower',
         #           extent=(t[0], t[-1], 20, 80), interpolation='nearest')
         # figname = plot_name.replace("ica", "ch_" + str(ch) + "_")
-        ax[nz[0][ch], nz[1][ch]].imshow(P_all, extent=[0, 0.5, 20, 80],  aspect='auto', origin='lower')
-        ax[nz[0][ch], nz[1][ch]].title.set_text(chosen_channels[ch])
         # py.imshow(P, aspect='auto', origin='lower', extent=(0, T, MinF, MaxF))
+        # axes_formatting(ax)
 
-    fig.suptitle("Signal name")
-    #fig.tight_layout()
-    fig.subplots_adjust(top = 0.88, hspace = 0.5)
+        #PLOTTING TO NEW FUNCTION
+        # ax[nz[0][ch], nz[1][ch]].imshow(P_all, extent=[0, 0.5, 20, 80],  aspect='auto', origin='lower')
+        # ax[nz[0][ch], nz[1][ch]].title.set_text(chosen_channels[ch])
 
-    py.show()
+
+
+
+    # fig.suptitle(plot_name[4:-4])
+    # #fig.tight_layout()
+    # fig.subplots_adjust(top = 0.88, hspace = 0.5)
+    #
+    # #plt.show()
+    # plt.savefig(out_path)
+    #########################################################################
+    #print(powers.shape)
+    return powers
+    # plt.clf()
+    # plt.close()
 
 
 # tu wersje z mne, ale mam problem z wczytaniem naszego sygnału jako "epoch":

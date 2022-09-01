@@ -198,6 +198,7 @@ class EpochsListInCase:
 
     def get_series(self, n_series, section_len=500, Fs=1000):
         list_of_array = []
+        #print("typ rzeczy w liscie epok: ", type(self._epoch_list[0]))
         for e in self._epoch_list:
             if int(e.series) == n_series:
                 starts, ends = e.inter_saccades_idx
@@ -219,7 +220,7 @@ class EpochsListInCase:
                             # _arr[ch, :] = np.interp(_x, _s_x, _s)
 
                         list_of_array.append(_arr)
-
+        #print("na koniec: ", type(list_of_array[0][0][0]))
         return list_of_array
 
 
