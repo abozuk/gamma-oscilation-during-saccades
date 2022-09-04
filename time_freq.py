@@ -68,7 +68,7 @@ def time_freq_scipy(signal):
     # py.figure()
     # py.imshow(np.abs(cwtmatr), extent=[0, 10, 0, 60], cmap='PRGn', aspect='auto', vmax=abs(cwtmatr).max(),
     #           vmin=-abs(cwtmatr).max())
-    fig, ax = plt.subplots(5,5,figsize=C_FIGSIZE)
+    # fig, ax = plt.subplots(5,5,figsize=C_FIGSIZE)
     # row = 0
     # col = 0
 
@@ -106,15 +106,15 @@ def time_freq_scipy(signal):
         # py.imshow(P_all, aspect='auto', origin='lower',
         #           extent=(t[0], t[-1], 20, 80), interpolation='nearest')
         # figname = plot_name.replace("ica", "ch_" + str(ch) + "_")
-        ax[nz[0][ch], nz[1][ch]].imshow(P_all, extent=[0, 0.5, 20, 80],  aspect='auto', origin='lower')
-        ax[nz[0][ch], nz[1][ch]].title.set_text(chosen_channels[ch])
-        # py.imshow(P, aspect='auto', origin='lower', extent=(0, T, MinF, MaxF))
+    #     ax[nz[0][ch], nz[1][ch]].imshow(P_all, extent=[0, 0.5, 20, 80],  aspect='auto', origin='lower')
+    #     ax[nz[0][ch], nz[1][ch]].title.set_text(chosen_channels[ch])
+    #     # py.imshow(P, aspect='auto', origin='lower', extent=(0, T, MinF, MaxF))
+    #
+    # fig.suptitle("Signal name")
+    # #fig.tight_layout()
+    # fig.subplots_adjust(top = 0.88, hspace = 0.5)
 
-    fig.suptitle("Signal name")
-    #fig.tight_layout()
-    fig.subplots_adjust(top = 0.88, hspace = 0.5)
-
-    py.show()
+    # py.show()
 
 
 # tu wersje z mne, ale mam problem z wczytaniem naszego sygnału jako "epoch":

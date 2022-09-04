@@ -213,9 +213,3 @@ class EpochsListInCase:
                         list_of_array.append(_arr)
 
         return list_of_array
-
-
-
-                # zwróć w macierzy odpowiednie odcinki czy jakoś tak
-
-
