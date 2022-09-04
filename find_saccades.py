@@ -1,14 +1,14 @@
 import numpy as np
 
 
-def get_min_diff(sig, idx_to_diff):
+def get_min_diff(sig, idx_to_diff, threshold=0.67):
     diff_sig = np.abs(sig[:-idx_to_diff] - sig[idx_to_diff:])
-    return np.quantile(diff_sig, 0.67)
+    return np.quantile(diff_sig, threshold)
 
 
-def get_max_diff(sig, idx_to_diff):
+def get_max_diff(sig, idx_to_diff, threshold=0.97):
     diff_sig = np.abs(sig[:-idx_to_diff] - sig[idx_to_diff:])
-    return np.quantile(diff_sig, 0.97)
+    return np.quantile(diff_sig, threshold)
 
 
 def moving_average(signal, len_single_avrg, overlap=1, extend=True):
@@ -34,7 +34,7 @@ def moving_average(signal, len_single_avrg, overlap=1, extend=True):
     return mov_avrgs
 
 
-def find_saccades(sig, Fs, min_diff=25, max_diff=80):
+def find_saccades_single_step_length(sig, Fs, min_diff=25, max_diff=80):
     """
 
     :param sig:
@@ -163,8 +163,38 @@ def find_saccades(sig, Fs, min_diff=25, max_diff=80):
         for j_f in range(1, to_fill[i_f + 1] - to_fill[i_f]):
             final_saccades = np.insert(final_saccades, to_fill[i_f] + j_f, final_saccades[to_fill[i_f]] + j_f)
 
-    # TODO
-    if len(final_saccades) > 0.9 * sig.size:
-        pass
 
     return final_saccades
+
+
+def find_saccades(sacc_sig, Fs):
+    saccades_list = []
+    for i in [0.05, 0.1, 0.2, 0.4]:
+        idx_to_diff = int(i * Fs)
+        min_dff = get_min_diff(sacc_sig, idx_to_diff)
+        max_dff = get_max_diff(sacc_sig, idx_to_diff)
+        saccades_list.append(find_saccades_single_step_length(sacc_sig, Fs, min_dff, max_dff))
+
+    saccades_idx = np.concatenate((saccades_list))
+    saccades_idx = np.unique(saccades_idx)
+    _breaks = np.where(np.diff(saccades_idx) > 1)[0]
+    _deleted = 0
+    for i_ in range(_breaks.size - 1):
+        try:
+            arr_std = np.std(sacc_sig[saccades_idx[_breaks[i_] - _deleted:_breaks[i_ + 1] - _deleted]])
+        except:
+            print("Nie da się usunąć!")
+            continue
+
+        if np.abs(arr_std) < np.mean(np.abs(sacc_sig[saccades_idx])) * 0.97:
+            saccades_idx = np.delete(saccades_idx, range(_breaks[i_] - _deleted, _breaks[i_ + 1] - _deleted))
+            _deleted += _breaks[i_ + 1] - _breaks[i_]
+
+    if saccades_idx.shape[0] > 0.1 * sacc_sig.shape[0]:
+        idx_to_diff = int(0.2 * Fs)
+        min_dff = get_min_diff(sacc_sig, idx_to_diff, 0.75)
+        max_dff = get_max_diff(sacc_sig, idx_to_diff)
+        saccades_idx = find_saccades_single_step_length(sacc_sig, Fs, min_dff, max_dff)
+        saccades_idx = np.unique(saccades_idx)
+
+    return saccades_idx

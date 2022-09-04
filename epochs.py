@@ -82,30 +82,8 @@ class Epoch:
 
     def find_saccades(self):
         sacc_sig = self._ica
-        saccades_list = []
-        for i in [0.05, 0.1, 0.2, 0.4]:
-            idx_to_diff = int(i * self._Fs)  # Jako argument?
-            min_dff = get_min_diff(sacc_sig, idx_to_diff)
-            max_dff = get_max_diff(sacc_sig, idx_to_diff)
-            saccades_list.append(find_saccades(sacc_sig, self._Fs, min_dff, max_dff))
+        self._saccades_idx = find_saccades(sacc_sig, self._Fs)
 
-        self._saccades_idx = np.concatenate((saccades_list))
-        self._saccades_idx = np.unique(self._saccades_idx)
-        _breaks = np.where(np.diff(self._saccades_idx) > 1)[0]
-        _deleted = 0
-        for i_ in range(_breaks.size - 1):
-            try:
-                arr_std = np.std(self._ica[self._saccades_idx[_breaks[i_] - _deleted:_breaks[i_ + 1] - _deleted]])
-            except:
-                print("Nie da się usunąć!")
-                continue
-
-            if np.abs(arr_std) < np.mean(np.abs(self._ica[self._saccades_idx])) * 0.95:
-                self._saccades_idx = np.delete(self._saccades_idx,
-                                               range(_breaks[i_] - _deleted, _breaks[i_ + 1] - _deleted))
-                _deleted += _breaks[i_ + 1] - _breaks[i_]
-
-        # print(self.series, self.image_number, self._saccades_idx.size)
         self._locate_saccades()
 
         return sacc_sig, self._saccades_idx
@@ -210,8 +188,11 @@ class EpochsListInCase:
         img_events = df.loc[df.description.str.contains("/P")]
         for idx, row in img_events.reindex().sort_index(ascending=False).iterrows():
             e = Epoch(extractor(idx, row))
+            print("Epoka", e)
             e.signal = sig_from_mne
             e.ica = ica[ica_ch][0][0]
+            print(e.ica.shape)
+
             e.find_saccades()
             self._epoch_list.append(e)
 
