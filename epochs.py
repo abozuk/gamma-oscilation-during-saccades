@@ -188,10 +188,8 @@ class EpochsListInCase:
         img_events = df.loc[df.description.str.contains("/P")]
         for idx, row in img_events.reindex().sort_index(ascending=False).iterrows():
             e = Epoch(extractor(idx, row))
-            print("Epoka", e)
             e.signal = sig_from_mne
             e.ica = ica[ica_ch][0][0]
-            print(e.ica.shape)
 
             e.find_saccades()
             self._epoch_list.append(e)
