@@ -35,7 +35,7 @@ if __name__ == "__main__":
     # Tworzenie obrazków z epokami z ica[1]
     path = "Data"
     output = "output"
-    #clean_directory(output)
+    # clean_directory(output)
     file_list = os.listdir(path)
     epoch_service = EpochsListInCase()
 
@@ -85,13 +85,11 @@ if __name__ == "__main__":
             for s in [1,2]:
                 #print("S: ", type(s))
                 list_of_sacceds_from_case = epoch_service.get_series(s)
-                #print(type(list_of_sacceds_from_case))
-                #print("Liczba odcinków:", len(list_of_sacceds_from_case), list_of_sacceds_from_case[0].shape)
-                time_freq_scipy(list_of_sacceds_from_case)
-                #time_freq_mne(list_of_sacceds_from_case, freqs)
-            # plot_ica_epochs(epoch_list, Fs, plot_path, True)
-            # plot_hist(epoch_list, os.path.join(output_path, plot_fname.replace("ica", "hist")))
-            # plot_hist_inter(epoch_list,
-            #                 os.path.join(output_path,
-            #                              plot_fname.replace("ica", "inter_saccades_hist")))
+                print("Liczba odcinków:", len(list_of_sacceds_from_case), list_of_sacceds_from_case[0].shape)
+                # time_freq_scipy(list_of_sacceds_from_case)
+            plot_ica_epochs(epoch_list, Fs, plot_path, True)
+            plot_hist(epoch_list, os.path.join(output_path, plot_fname.replace("ica", "hist")))
+            plot_hist_inter(epoch_list,
+                            os.path.join(output_path,
+                                         plot_fname.replace("ica", "inter_saccades_hist")))
             # plot_channels_epochs(epoch_list, Fs, plot_path)
