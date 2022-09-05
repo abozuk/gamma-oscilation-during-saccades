@@ -50,6 +50,7 @@ def time_freq_scipy(signal):
             P_all += np.abs(cwtmatr)
         P_all = np.log(P_all / len(signal))
         powers[ch, :, :] = P_all
-        print("channel: ", ch + 1)
+
+        print("channel: ", ch + 1, P_all)
 
     return powers

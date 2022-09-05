@@ -141,6 +141,7 @@ if __name__ == "__main__":
                 except:
                     continue
             idx += 1
+
     np.save(os.path.join(OUTPUT_PATH, "data_matrix.npy"), data_matrix)
     with open(os.path.join(OUTPUT_PATH, 'names_idx.json'), 'w') as f:
         json.dump(names_to_idx, f, indent=4)
