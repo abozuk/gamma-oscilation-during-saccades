@@ -6,7 +6,7 @@ import json
 from wczytywanie_i_blinki_mne_numpy import wczytaj, detektor_bs
 from epochs import EpochsListInCase
 from plot_epochs import plot_ica_epochs
-from plot_his import plot_hist, plot_hist_inter
+from plot_his import plot_hist_inter
 from time_freq import time_freq_scipy
 import numpy as np
 
