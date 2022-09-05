@@ -50,7 +50,7 @@ def get_plot_name(fname):
 if __name__ == "__main__":
 
     # clean output dir
-    clean_directory(OUTPUT_PATH)
+    # clean_directory(OUTPUT_PATH)
     # create .txt file to storing information about the loaded data
     f = open(os.path.join(OUTPUT_PATH, "raport.txt"), "w")
     f.close()
@@ -121,10 +121,12 @@ if __name__ == "__main__":
             plot_fname = get_plot_name(f)
             plot_path = os.path.join(OUTPUT_PATH, plot_fname)
 
+            names_to_idx[f'{plot_fname[9:15]}'] = idx
+
             # there are two series of images
             for s in [1, 2]:
                 try:
-                    # list of eras for a given series for a given case
+                    # list of epochs for a given series for a given case
                     list_of_sacceds_from_case = epoch_service.get_series(s)
 
                     P_all = time_freq_scipy(list_of_sacceds_from_case)
@@ -138,3 +140,6 @@ if __name__ == "__main__":
                 except:
                     continue
             idx += 1
+    np.save(os.path.join(OUTPUT_PATH, "data_matrix.npy"), data_matrix)
+    with open(os.path.join(OUTPUT_PATH, 'names_idx.json'), 'w') as f:
+        json.dump(names_to_idx, f, indent=4)
