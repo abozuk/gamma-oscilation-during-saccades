@@ -37,7 +37,7 @@ def clean_directory(dir_path):
             print('Failed to delete %s. Reason: %s' % (file_path, e))
 
 
-def get_plot_name(fname):
+def get_plot_name(fname, case):
     plot_fname = "ica_"
     plot_fname += case
     plot_fname += re.findall("(watch\d*)?_run.*\.vhdr", fname)[0]
@@ -51,6 +51,7 @@ if __name__ == "__main__":
 
     # clean output dir
     # clean_directory(OUTPUT_PATH)
+
     # create .txt file to storing information about the loaded data
     f = open(os.path.join(OUTPUT_PATH, "raport.txt"), "w")
     f.close()
@@ -118,10 +119,10 @@ if __name__ == "__main__":
             # searching and creating names and paths
             case = re.findall("-(.*?)t", f)[0]
             print("case ", case[:-1])
-            plot_fname = get_plot_name(f)
+            plot_fname = get_plot_name(f, case)
             plot_path = os.path.join(OUTPUT_PATH, plot_fname)
 
-            names_to_idx[f'{plot_fname[9:15]}'] = idx
+            names_to_idx[f'{plot_fname[4:-4]}'] = idx
 
             # there are two series of images
             for s in [1, 2]:
