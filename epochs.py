@@ -21,7 +21,8 @@ class Epoch:
                                                      self.image_number)
 
     def __repr__(self):
-        return self.series + self.image_number
+        return "series: {}, image number: {}".format(self.series,
+                                                     self.image_number)
 
     @property
     def event_idx(self):
@@ -81,12 +82,8 @@ class Epoch:
 
     def find_saccades(self):
         sacc_sig = self._ica
+        self._saccades_idx = find_saccades(sacc_sig, self._Fs)
 
-        idx_to_diff = int(0.2 * self._Fs)  # Jako argument?
-
-        min_dff = get_min_diff(sacc_sig, idx_to_diff)
-        max_dff = get_max_diff(sacc_sig, idx_to_diff)
-        self._saccades_idx = find_saccades(sacc_sig, self._Fs, min_dff, max_dff)
         self._locate_saccades()
 
         return sacc_sig, self._saccades_idx
@@ -100,16 +97,19 @@ class Epoch:
         starts.extend(ssacc[where_stops + 1])
         starts = np.array(starts[:-1])
         self._loc_saccades_idx = (starts, ends)
+
         self._locate_inter_saccades(ssacc, where_stops, ends)
         return starts, ends
 
     def _locate_inter_saccades(self, ssacc, where_stops, ends):
         if self._loc_saccades_idx[0].size == 0:
             self._inter_saccades_idx = ([0], [self.signal.size])
+
             return 0
         elif self._loc_saccades_idx[0][0] == 0:
             inter_starts = [0]
         else:
+
             inter_starts = []
 
         inter_starts.extend(ends)
@@ -190,13 +190,14 @@ class EpochsListInCase:
             e = Epoch(extractor(idx, row))
             e.signal = sig_from_mne
             e.ica = ica[ica_ch][0][0]
+
             e.find_saccades()
             self._epoch_list.append(e)
 
         self._n_epochs = len(self)
         return self._epoch_list
 
-    def get_series(self, n_series, section_len=500, Fs=1000):
+    def get_series(self, n_series, section_len=500):
         list_of_array = []
         #print("typ rzeczy w liscie epok: ", type(self._epoch_list[0]))
         for e in self._epoch_list:
@@ -207,24 +208,9 @@ class EpochsListInCase:
                     if _len > section_len:
                         _arr = np.zeros((e.signal.shape[0], section_len))
                         for ch in range(_arr.shape[0]):
-                            _s = e.signal[ch,st_idx:st_idx + section_len]
+                            _s = e.signal[ch, st_idx:st_idx + section_len]
                             _arr[ch, :] = _s
-                            # _s_x = np.arange(st_idx, end_idx)
-                            # if _s_x.size > _s.size:
-                            #     _s_x = _s_x[:_s_x.size]
-                            #     print("poprawa", _s_x.size)
-                            #
-                            # _x = np.arange(st_idx, end_idx, np.abs(st_idx - end_idx)/section_len)
-                            # if _x.size > section_len:
-                            #     _x = _x[:section_len]
-                            # _arr[ch, :] = np.interp(_x, _s_x, _s)
 
                         list_of_array.append(_arr)
         #print("na koniec: ", type(list_of_array[0][0][0]))
         return list_of_array
-
-
-
-                # zwróć w macierzy odpowiednie odcinki czy jakoś tak
-
-
