@@ -4,7 +4,6 @@ import pylab as py
 
 def average_tf(filename, x_shape=10, y_shape=100):
     data = np.load(filename)
-    data = data[:4]
 
     # TODO do uogólnienia, jeśli wymiary by się nie dzieliły całkowicie
     f_shape = data.shape[3]//x_shape
@@ -23,9 +22,10 @@ if __name__ == "__main__":
     filename = 'output/data_matrix.npy'
     average = average_tf(filename)
     print(average.shape)
-    avg1 = np.mean(average[:,:,0,:,:], axis=2)
-    avg2 = np.mean(average[:, :, 1, :, :], axis=2)
-    print(avg1 - avg2)
+    avg1 = np.mean(average[:,:,0,:,:], axis=0)
+    avg2 = np.mean(average[:, :, 1, :, :], axis=0)
+    print(np.abs(avg1 - avg2)[-1,:,2])
+    print(np.abs(avg1 - avg2)[-1, :, 3])
 
     #żeby sprawdzić czy mapki w miarę z sensem
     # py.imshow(average[0, 0, :, :], aspect='auto', origin='lower', interpolation='nearest')
