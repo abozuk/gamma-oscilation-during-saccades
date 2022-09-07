@@ -15,13 +15,13 @@ def stats(arr1):
     p_all = np.zeros((arr1.shape[1], arr1.shape[-2], arr1.shape[-1]))
     for ch in range(arr1.shape[1]):
 
-        print("Kanał ", chosen_channels[ch])
+        # print("Kanał ", chosen_channels[ch])
 
         #test nieparametryczny
         #https: // docs.scipy.org / doc / scipy / reference / generated / scipy.stats.wilcoxon.html
         for f in range(arr1.shape[-2]):
             for t in range(arr1.shape[-1]):
-                z, p_all[ch, f, t] = st.wilcoxon(average[:,ch, 0, f, t].flatten(), average[:,ch,1, f, t].flatten())
+                z, p_all[ch, f, t] = st.wilcoxon(arr1[:,ch, 0, f, t].flatten(), arr1[:,ch,1, f, t].flatten())
         #jest gdzieś różnica
         # test prostokąt po prostokącie w danym okienku (oddzielnie dla kanału)
         # dla osób (po osobach)
@@ -41,10 +41,10 @@ def stats(arr1):
     # print(s_w)
 
     # print("Czy odrzucić hipotezę zerową: ", reject_fdr, "\n")
-    print(p_all)
-    print(p_all.shape)
-    print(reject_fdr)
-    print(reject_fdr.shape)
+    # print(p_all)
+    # print(p_all.shape)
+    # print(reject_fdr)
+    # print(reject_fdr.shape)
     return p_all, reject_fdr
 
 if __name__ == "__main__":
