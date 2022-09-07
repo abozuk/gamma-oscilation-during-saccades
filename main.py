@@ -76,6 +76,8 @@ if __name__ == "__main__":
     idx = 0
     files_names = []
 
+    epoch_all_list = []
+
     for f in file_list:
         pattern = "sub-.*_task_art_watch" + ".*\.vhdr$"
 
@@ -113,6 +115,7 @@ if __name__ == "__main__":
             # list of epochs for the case
             epoch_list = epoch_service.epochs_factory(df, signal_from_mne,
                                                       ica, ica_ch)
+            epoch_all_list.extend(epoch_list)
             # reversing the order to be chronological in list
             epoch_list.reverse()
 
@@ -130,17 +133,20 @@ if __name__ == "__main__":
                     # list of epochs for a given series for a given case
                     list_of_sacceds_from_case = epoch_service.get_series(s)
 
-                    P_all = time_freq_scipy(list_of_sacceds_from_case)
-                    data_matrix[idx, :, s - 1, :, :] = P_all
+                    # P_all = time_freq_scipy(list_of_sacceds_from_case)
+                    # data_matrix[idx, :, s - 1, :, :] = P_all
 
                     # additional plots
-                    plot_ica_epochs(epoch_list, Fs, plot_path, True)
+                    # plot_ica_epochs(epoch_list, Fs, plot_path, True)
                     plot_hist_inter(epoch_list,
                                     os.path.join(OUTPUT_PATH,
                                                  plot_fname.replace("ica", "inter_saccades_hist")))
                 except:
                     continue
             idx += 1
+
+    plot_hist_inter(epoch_all_list,
+                    os.path.join(OUTPUT_PATH,"inter_saccades_hist_all.png"))
 
     np.save(os.path.join(OUTPUT_PATH, "data_matrix.npy"), data_matrix)
     with open(os.path.join(OUTPUT_PATH, 'names_idx.json'), 'w') as f:
