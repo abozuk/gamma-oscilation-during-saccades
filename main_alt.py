@@ -8,7 +8,7 @@ from epochs import EpochsListInCase
 from plot_epochs import plot_ica_epochs
 from plot_ch_epochs import plot_channels_epochs
 from plot_his import plot_hist, plot_hist_inter
-from time_freq import time_freq_spectogram, time_freq_scipy
+from time_freq import time_freq_scipy
 
 
 def read_json(path):

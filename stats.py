@@ -39,8 +39,8 @@ if __name__ == "__main__":
     average = average_tf(filename)  # 19 kan, 2 serie, 60 x 500
 
     # uśrednianie po osobach
-    avg1 = np.mean(average[:, :, 0, :, :], axis=0)
-    avg2 = np.mean(average[:, :, 1, :, :], axis=0)
+    # avg1 = np.mean(average[:, :, 0, :, :], axis=0)
+    # avg2 = np.mean(average[:, :, 1, :, :], axis=0)
 
     #H0: średnie w obu seriach są takie same
     stats(avg1, avg2)
