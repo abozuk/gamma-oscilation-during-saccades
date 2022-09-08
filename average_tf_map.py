@@ -2,13 +2,13 @@ import numpy as np
 import pylab as py
 import os
 
+
 def average_tf(filename, x_shape=10, y_shape=100):
     data = np.load(filename)
-    #data = data[:4]
 
     # TODO do uogólnienia, jeśli wymiary by się nie dzieliły całkowicie
-    f_shape = data.shape[3]//x_shape
-    t_shape = data.shape[4]//y_shape
+    f_shape = data.shape[3] // x_shape
+    t_shape = data.shape[4] // y_shape
     average_data = np.zeros((data.shape[0], 19, 2,
                              f_shape,
                              t_shape))
@@ -21,10 +21,17 @@ def average_tf(filename, x_shape=10, y_shape=100):
 
     return average_data
 
+
 if __name__ == "__main__":
     filename = 'output/data_matrix.npy'
     average = average_tf(filename)
-
-    #uśrednianie po osobach
-    avg1 = np.mean(average[:,:,0,:,:], axis=0)
+    print(average.shape)
+    print(average)
+    avg1 = np.mean(average[:, :, 0, :, :], axis=0)
     avg2 = np.mean(average[:, :, 1, :, :], axis=0)
+    print(np.abs(avg1 - avg2)[-1, :, 2])
+    print(np.abs(avg1 - avg2)[-1, :, 3])
+
+    # żeby sprawdzić czy mapki w miarę z sensem
+    # py.imshow(average[0, 0, :, :], aspect='auto', origin='lower', interpolation='nearest')
+    # py.show()

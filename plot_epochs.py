@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as font_manager
 
-
 C_DPI = 300
 
 # C_DEFAULT_FONT_PATH = '/usr/share/fonts/truetype/msttcorefonts/Arial.ttf'
@@ -11,7 +10,6 @@ C_DEFAULT_FONT_PATH = 'C:\Windows\Fonts\Arial.ttf'
 C_DEFAULT_FONT_SIZE = 8
 C_DEFAULT_FONT_PROP = font_manager.FontProperties(fname=C_DEFAULT_FONT_PATH,
                                                   size=C_DEFAULT_FONT_SIZE)
-
 
 Y_LABEL = r'ica'
 X_LABEL = r'time [s]'
@@ -31,6 +29,7 @@ def cm2inch(x):
 
 
 C_FIGSIZE = (cm2inch(50), cm2inch(19))
+
 
 def axes_formatting(ax):
     """
@@ -85,7 +84,6 @@ def axes_formatting(ax):
     ax.set_xticks(x_majors)
     ax.set_xticklabels(labels)
 
-
     # Format labels
     for label in ax.get_yticklabels():
         label.set_fontproperties(C_DEFAULT_FONT_PROP)
@@ -93,8 +91,6 @@ def axes_formatting(ax):
     for label in ax.get_xticklabels():
         label.set_fontproperties(C_DEFAULT_FONT_PROP)
         label.set_fontsize(C_DEFAULT_FONT_SIZE)
-
-
 
 
 def plot_ica_epochs(epoch_list, Fs, output_path, saccades=False):
@@ -111,7 +107,6 @@ def plot_ica_epochs(epoch_list, Fs, output_path, saccades=False):
         if saccades is True:
             starts, ends = e.loc_saccades_idx
             for s, e in zip(starts, ends):
-
                 ax.plot(t[s:e], sig[s:e], linewidth=LINEWIDTH, color='red')
 
         axes_formatting(ax)

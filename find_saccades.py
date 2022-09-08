@@ -163,7 +163,6 @@ def find_saccades_single_step_length(sig, Fs, min_diff=25, max_diff=80):
         for j_f in range(1, to_fill[i_f + 1] - to_fill[i_f]):
             final_saccades = np.insert(final_saccades, to_fill[i_f] + j_f, final_saccades[to_fill[i_f]] + j_f)
 
-
     return final_saccades
 
 

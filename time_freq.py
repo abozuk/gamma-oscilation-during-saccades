@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from mne.time_frequency import tfr_multitaper, tfr_stockwell, tfr_morlet, tfr_array_morlet
 
+
 def cm2inch(x):
     return x * 0.39
 
@@ -35,9 +36,9 @@ def cwt(x, MinF, MaxF, Fs, w=7.0, df=1.0, plot=False):
         py.show()
     return P, freqs, t
 
-def time_freq_scipy(signal):
 
-    powers = np.zeros((19,60,500))
+def time_freq_scipy(signal):
+    powers = np.zeros((19, 60, 500))
     for ch in range(19):
 
         P_all = 0
@@ -48,7 +49,8 @@ def time_freq_scipy(signal):
 
             P_all += np.abs(cwtmatr)
         P_all = np.log(P_all / len(signal))
-        powers[ch,:,:] = P_all
-        print("channel: ", ch+1)
+        powers[ch, :, :] = P_all
+
+        print("channel: ", ch + 1)
 
     return powers

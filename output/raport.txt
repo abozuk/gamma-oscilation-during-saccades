@@ -1,0 +1,25 @@
+Ignored: Data\sub-BRO201_task_art_watch1_run-01.vhdr
+Ignored: Data\sub-CKA387_task_art_watch_run-01.vhdr
+Ignored: Data\sub-ICZ430_task_art_watch1_run-01.vhdr
+Ignored: Data\sub-ICZ430_task_art_watch2_run-01.vhdr
+Ignored: Data\sub-ICZ865_task_art_watch1_run-01.vhdr
+Ignored: Data\sub-ITS396_task_art_watch1_run-01.vhdr
+Ignored: Data\sub-LKO678_task_art_watch2_run-01.vhdr
+Can't read: Data\sub-OCH989_task_art_watch1_run-01.vhdr
+Ignored: Data\sub-SKA018_task_art_watch1_run-01.vhdr
+Ignored: Data\sub-SKA018_task_art_watch2_run-01.vhdr
+Ignored: Data\sub-SKA098_task_art_watch2_run-01.vhdr
+Ignored: Data\sub-SKA131_task_art_watch1_run-01.vhdr
+Ignored: Data\sub-SKA131_task_art_watch2_run-01.vhdr
+Ignored: Data\sub-SKA809_task_art_watch1_run-01.vhdr
+Ignored: Data\sub-SKA974_task_art_watch1_run-01.vhdr
+Ignored: Data\sub-SKA974_task_art_watch2_run-01.vhdr
+Ignored: Data\sub-SKI089_task_art_watch1_run-01.vhdr
+Ignored: Data\sub-SKI089_task_art_watch2_run-01.vhdr
+Ignored: Data\sub-SKI864_task_art_watch1_run-01.vhdr
+Ignored: Data\sub-SKI864_task_art_watch2_run-01.vhdr
+Ignored: Data\sub-SKI994_task_art_watch1_run-01.vhdr
+Ignored: Data\sub-SKI994_task_art_watch2_run-01.vhdr
+Ignored: Data\sub-ZEK799_task_art_watch1_run-01.vhdr
+Ignored: Data\sub-ZEK799_task_art_watch2_run-01.vhdr
+Ignored: Data\sub-ZYK128_task_art_watch1_run-01.vhdr
