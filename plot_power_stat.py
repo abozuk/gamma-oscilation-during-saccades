@@ -10,8 +10,8 @@ import matplotlib.font_manager as font_manager
 
 C_DPI = 300
 
-# C_DEFAULT_FONT_PATH = '/usr/share/fonts/truetype/msttcorefonts/Arial.ttf'
-C_DEFAULT_FONT_PATH = 'C:\Windows\Fonts\Arial.ttf'
+C_DEFAULT_FONT_PATH = '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf'
+#C_DEFAULT_FONT_PATH = 'C:\Windows\Fonts\Arial.ttf'
 
 C_DEFAULT_FONT_SIZE = 8
 C_DEFAULT_FONT_PROP = font_manager.FontProperties(fname=C_DEFAULT_FONT_PATH,
@@ -34,7 +34,7 @@ def cm2inch(x):
     return x * 0.39
 
 
-C_FIGSIZE = (cm2inch(19), cm2inch(13))
+C_FIGSIZE = (cm2inch(25), cm2inch(15))
 
 
 def axes_formatting(ax):
@@ -99,13 +99,13 @@ def axes_formatting(ax):
         label.set_fontsize(C_DEFAULT_FONT_SIZE)
 
 
-def power_density_map(p, ch_number, nz, chosen_channels, out_path):
+def power_density_map(p, ch_number, nz, chosen_channels, out_path, rejected_fdr):
     fig, axs = plt.subplots(5, 5, figsize=C_FIGSIZE)
     for ch in range(ch_number):
         ax = axs[nz[0][ch], nz[1][ch]]
-
-        im = ax.imshow(p[ch], extent=[0, 0.5, 20, 80],
-                       aspect='auto', origin='lower')  # extent=[0, 0.5, 0, 60]
+        myMatrix = np.ma.masked_where((rejected_fdr[ch] == False ), p[ch])
+        im = ax.imshow(myMatrix, cmap='jet', extent=[0, 0.5, 20, 80],
+                       aspect='auto', origin='lower',vmin=0, vmax=1)  # extent=[0, 0.5, 0, 60]
         # plt.colorbar(im, cax=ax)
 
         ax.title.set_text(chosen_channels[ch])
@@ -135,8 +135,11 @@ def power_density_map(p, ch_number, nz, chosen_channels, out_path):
 
 
 
-    prop = dict(left=0.055, top=0.96, bottom=0.075, right=0.99, hspace=0.55, wspace=0.3)
+    prop = dict(left=0.055, top=0.96, bottom=0.075, right=0.8, hspace=0.55, wspace=0.3)
     plt.subplots_adjust(**prop)
+
+    cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+    fig.colorbar(im, cax=cbar_ax)
     plt.savefig(out_path, dpi=C_DPI)
     plt.cla()
     plt.close()
@@ -164,7 +167,7 @@ def get_power_plots(avg_tf, rejected_fdr):
     tf_diff_avg = np.mean(tf_diff, axis=0)
     print(tf_diff_avg.shape)
     out_path= "output/00.png"
-    power_density_map(tf_diff_avg, tf_diff_avg.shape[0], nz, chosen_channels, out_path)
+    power_density_map(tf_diff_avg, tf_diff_avg.shape[0], nz, chosen_channels, out_path, rejected_fdr)
 
     # for i, case in enumerate(case_names):
     #     for s in [0, 1]:
