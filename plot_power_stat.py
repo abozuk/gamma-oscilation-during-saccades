@@ -100,12 +100,14 @@ def axes_formatting(ax):
 
 
 def power_density_map(p, ch_number, nz, chosen_channels, out_path, rejected_fdr):
+    # print("max: ", p.max())
+    # print("min: ", p.min())
     fig, axs = plt.subplots(5, 5, figsize=C_FIGSIZE)
     for ch in range(ch_number):
         ax = axs[nz[0][ch], nz[1][ch]]
         myMatrix = np.ma.masked_where((rejected_fdr[ch] == False ), p[ch])
         im = ax.imshow(myMatrix, cmap='jet', extent=[0, 0.5, 20, 80],
-                       aspect='auto', origin='lower',vmin=0, vmax=1)  # extent=[0, 0.5, 0, 60]
+                       aspect='auto', origin='lower',vmin=p.min(), vmax=p.max())  # extent=[0, 0.5, 0, 60]
         # plt.colorbar(im, cax=ax)
 
         ax.title.set_text(chosen_channels[ch])
